@@ -9,12 +9,13 @@ let condition=[];
 let value=[];
 let returnArray=[];
 //let i ;
-let j = 1 ;
+let j ;
 let myBody = [];
 let myParams = [];
 let myFunctions = [];
 
 function constructor(){
+    j = 1 ;
     line = new Array();
     type = new Array();
     name = new Array ();
@@ -43,8 +44,8 @@ const parseCode = (codeToParse) => {
 
 const first = (parseCode)=>{
     constructor();
-    if (parseCode.body != null){
-        if(parseCode.body[0].type == 'FunctionDeclaration'){
+    //if (parseCode.body != null){
+        if(parseCode.body.length > 0 && parseCode.body[0].type == 'FunctionDeclaration'){
             myBody = parseCode.body[0].body.body;
             myParams = parseCode.body[0].params;
             myFunctions = parseCode.body[0];
@@ -52,7 +53,7 @@ const first = (parseCode)=>{
             paramsDec (myParams);
             myParse(myBody, 0);}
         else{myBody = parseCode.body;
-            myParse(myBody, 0);}}
+            myParse(myBody, 0);}//}
     arrrayForTBL();
     /*return makeTableHTML (returnArray);*/return returnArray ; };
 
@@ -77,9 +78,9 @@ const myParse2 = (parseCode, i) => {
     if (statment == 'IfStatement'){
         IfState(parseCode[i], i);
         return;}
-    else if (statment == 'UpdateStatement'){
-        updateState (parseCode[i].expression());
-        return ;}
+    //else if (statment == 'UpdateStatement'){
+        //updateState (parseCode[i].expression());
+        //return ;}
     else{
         myParse3(parseCode, i);
         return ; }
@@ -97,8 +98,8 @@ const myParse3 = (parseCode, i) => {
     else if (statment == 'ReturnStatement'){
         ReturnState(parseCode, i);
         return;}
-    else{
-        return ; }
+    //else{
+        //return ; }
 };
 
 
@@ -177,9 +178,10 @@ function rigth (parseCode){
         return parseCode.name ;}
     else if (state == 'BinaryExpression'){
         return escodegen.generate(parseCode);}
-    else if (state == 'MemberExpression'){
+    //else if (state == 'MemberExpression'){
+    else
         return parseCode.object.name + '[' + rigth(parseCode.property) + ']' ;
-    }
+    //}
 }
 
 function IfState (parseCode, i){
@@ -195,7 +197,7 @@ function IfState (parseCode, i){
         myParse(a[0].body, 0);}
     else {myParse(a, i);}
     if (parseCode.alternate!= null){
-        elseState(parseCode.alternate, 0); }
+        elseState(parseCode.alternate, 0);}
 }
 
 function elseState (parseCode){
@@ -230,7 +232,6 @@ function WhileState (parseCode) {
     for (let k = 0 ; k < parseCode.body.body.length ; k++)
         a.push(parseCode.body.body[k]);
     myParse(a, 0);
-    //i = i - a.length;
 }
 
 function ForState (parseCode, i) {
@@ -240,13 +241,21 @@ function ForState (parseCode, i) {
     condition [j] = escodegen.generate(parseCode[i].test);
     value [j] = null;
     j++;
-    if (parseCode[i].init.type == 'VariableDeclaration'){
-        forVariableDec(parseCode[i].init);}
-    else if (parseCode[i].init.type == 'ExpressionStatement' || parseCode[i].init.type == 'AssignmentExpression'){
-        AssignmentExp(parseCode[i].init);}
+    if (parseCode[i].init != null) {
+        if (parseCode[i].init.type == 'VariableDeclaration') {
+            forVariableDec(parseCode[i].init);
+        }
+        else if (parseCode[i].init.type == 'ExpressionStatement' || parseCode[i].init.type == 'AssignmentExpression') {
+            AssignmentExp(parseCode[i].init);
+        }
+    }
     forUpdate(parseCode[i].update);
+    ForState2(parseCode, i);
+}
+
+function ForState2(parseCode, i) {
     let a = [];
-    for (let k = 0 ; k < parseCode[i].body.body.length ; k++)
+    for (let k = 0; k < parseCode[i].body.body.length; k++)
         a.push(parseCode[i].body.body[k]);
     myParse(a, 0);
 }
@@ -257,9 +266,9 @@ function forVariableDec(parseCode){
     type [j] = 'variable declaration';
     name [j] = parseCode.declarations[0].id.name;
     condition [j] = null;
-    if (parseCode.declarations[0].init == null){
+    /*if (parseCode.declarations[0].init == null){
         value [j] = null; }
-    else {value[j] = rigth(parseCode.declarations[0].init) ; }
+    else {*/value[j] = rigth(parseCode.declarations[0].init) ;// }
     j++;
 }
 
@@ -313,4 +322,3 @@ export {parseCode};
 export {first};
 export {deleteResults} ;
 export {returnArray};
-//export {makeTableHTML};
