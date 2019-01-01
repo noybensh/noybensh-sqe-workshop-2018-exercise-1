@@ -8,11 +8,11 @@ let name=[];
 let condition=[];
 let value=[];
 let returnArray=[];
-//let i ;
 let j ;
 let myBody = [];
 let myParams = [];
 let myFunctions = [];
+
 
 function constructor(){
     j = 1 ;
@@ -44,18 +44,17 @@ const parseCode = (codeToParse) => {
 
 const first = (parseCode)=>{
     constructor();
-    //if (parseCode.body != null){
-        if(parseCode.body.length > 0 && parseCode.body[0].type == 'FunctionDeclaration'){
-            myBody = parseCode.body[0].body.body;
-            myParams = parseCode.body[0].params;
-            myFunctions = parseCode.body[0];
-            FunctionDec (myFunctions);
-            paramsDec (myParams);
-            myParse(myBody, 0);}
-        else{myBody = parseCode.body;
-            myParse(myBody, 0);}//}
+    if(parseCode.body.length > 0 && parseCode.body[0].type == 'FunctionDeclaration'){
+        myBody = parseCode.body[0].body.body;
+        myParams = parseCode.body[0].params;
+        myFunctions = parseCode.body[0];
+        FunctionDec (myFunctions);
+        paramsDec (myParams);
+        myParse(myBody, 0);}
+    else{myBody = parseCode.body;
+        myParse(myBody, 0);}//}
     arrrayForTBL();
-    /*return makeTableHTML (returnArray);*/return returnArray ; };
+    return returnArray ; };
 
 
 const myParse = (parseCode, i) => {
@@ -78,9 +77,6 @@ const myParse2 = (parseCode, i) => {
     if (statment == 'IfStatement'){
         IfState(parseCode[i], i);
         return;}
-    //else if (statment == 'UpdateStatement'){
-        //updateState (parseCode[i].expression());
-        //return ;}
     else{
         myParse3(parseCode, i);
         return ; }
@@ -95,11 +91,9 @@ const myParse3 = (parseCode, i) => {
     else if (statment == 'ForStatement'){
         ForState(parseCode, i);
         return ;}
-    else if (statment == 'ReturnStatement'){
-        ReturnState(parseCode, i);
-        return;}
-    //else{
-        //return ; }
+    else //if (statment == 'ReturnStatement'){
+        return ReturnState(parseCode, i);
+
 };
 
 
@@ -178,10 +172,8 @@ function rigth (parseCode){
         return parseCode.name ;}
     else if (state == 'BinaryExpression'){
         return escodegen.generate(parseCode);}
-    //else if (state == 'MemberExpression'){
-    else
+    else //state == 'MemberExpression'
         return parseCode.object.name + '[' + rigth(parseCode.property) + ']' ;
-    //}
 }
 
 function IfState (parseCode, i){
@@ -242,10 +234,7 @@ function ForState (parseCode, i) {
     value [j] = null;
     j++;
     if (parseCode[i].init != null) {
-        if (parseCode[i].init.type == 'VariableDeclaration') {
-            forVariableDec(parseCode[i].init);
-        }
-        else if (parseCode[i].init.type == 'ExpressionStatement' || parseCode[i].init.type == 'AssignmentExpression') {
+        if (parseCode[i].init.type == 'ExpressionStatement' || parseCode[i].init.type == 'AssignmentExpression') {
             AssignmentExp(parseCode[i].init);
         }
     }
@@ -258,18 +247,6 @@ function ForState2(parseCode, i) {
     for (let k = 0; k < parseCode[i].body.body.length; k++)
         a.push(parseCode[i].body.body[k]);
     myParse(a, 0);
-}
-
-
-function forVariableDec(parseCode){
-    line [j] = parseCode.loc.start.line;
-    type [j] = 'variable declaration';
-    name [j] = parseCode.declarations[0].id.name;
-    condition [j] = null;
-    /*if (parseCode.declarations[0].init == null){
-        value [j] = null; }
-    else {*/value[j] = rigth(parseCode.declarations[0].init) ;// }
-    j++;
 }
 
 
@@ -306,19 +283,6 @@ function arrrayForTBL(){
     returnArray [4] = value ;
 }
 
-function deleteResults() {
-    returnArray = new Array();
-    line= new Array ();
-    type= new Array();
-    name=new Array();
-    condition=new Array();
-    value=new Array();
-    myBody = new Array();
-    myParams = new Array();
-    myFunctions = new Array();
-}
-
 export {parseCode};
 export {first};
-export {deleteResults} ;
 export {returnArray};
